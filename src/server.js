@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { runPipeline } from './orchestrator.js';
 import { SAMPLE_PRS } from './sample-prs.js';
+import { fetchPRData } from './github.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -20,6 +21,20 @@ app.get('/api/samples/:id', (req, res) => {
   const sample = SAMPLE_PRS.find(s => s.id === req.params.id);
   if (!sample) return res.status(404).json({ error: 'Sample not found' });
   res.json(sample);
+});
+
+// ── GitHub PR fetch endpoint ───────────────────────────────────────────────
+
+app.get('/api/fetch-pr', async (req, res) => {
+  const { url } = req.query;
+  if (!url) return res.status(400).json({ error: 'url query parameter is required' });
+
+  try {
+    const prData = await fetchPRData(url);
+    res.json(prData);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 // ── Review pipeline endpoint (Server-Sent Events) ─────────────────────────
