@@ -7,10 +7,11 @@ let reviewText = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   loadSamples();
-  addFileBlock();                          // Start with one file slot
+  addFileBlock();
   document.getElementById('addFileBtn').addEventListener('click', addFileBlock);
   document.getElementById('prForm').addEventListener('submit', handleSubmit);
   document.getElementById('copyBtn').addEventListener('click', copyReview);
+  document.getElementById('fetchBtn').addEventListener('click', handleFetchPR);
 });
 
 // ── Sample PRs ────────────────────────────────────────────────────────────
@@ -45,6 +46,48 @@ async function loadSample(id) {
   data.files.forEach(file => {
     addFileBlock(file.name, file.diff);
   });
+}
+
+// ── GitHub PR fetch ───────────────────────────────────────────────────────
+
+async function handleFetchPR() {
+  const url = document.getElementById('prUrl').value.trim();
+  if (!url) return;
+
+  const btn = document.getElementById('fetchBtn');
+  const status = document.getElementById('fetchStatus');
+
+  btn.disabled = true;
+  btn.querySelector('.btn-text').style.display = 'none';
+  btn.querySelector('.btn-spinner').style.display = 'block';
+  status.textContent = 'Fetching PR from GitHub...';
+  status.className = 'github-hint';
+
+  try {
+    const data = await fetch(`/api/fetch-pr?url=${encodeURIComponent(url)}`).then(async r => {
+      if (!r.ok) {
+        const err = await r.json();
+        throw new Error(err.error);
+      }
+      return r.json();
+    });
+
+    document.getElementById('prTitle').value = data.title;
+    document.getElementById('prDescription').value = data.description;
+    document.getElementById('filesContainer').innerHTML = '';
+    fileCount = 0;
+    data.files.forEach(file => addFileBlock(file.name, file.diff));
+
+    status.textContent = `Loaded ${data.files.length} file${data.files.length !== 1 ? 's' : ''} from GitHub`;
+    status.className = 'github-hint success';
+  } catch (err) {
+    status.textContent = err.message;
+    status.className = 'github-hint error';
+  } finally {
+    btn.disabled = false;
+    btn.querySelector('.btn-text').style.display = 'block';
+    btn.querySelector('.btn-spinner').style.display = 'none';
+  }
 }
 
 // ── File blocks ───────────────────────────────────────────────────────────

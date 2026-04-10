@@ -29,8 +29,21 @@
           <h2>Pull Request</h2>
         </div>
 
+        <div class="github-section">
+          <p class="samples-label">Review a real GitHub PR</p>
+          <div class="github-input-row">
+            <input type="text" id="prUrl" placeholder="https://github.com/owner/repo/pull/123">
+            <button type="button" class="btn-fetch" id="fetchBtn">
+              <span class="btn-text">Fetch</span>
+              <span class="btn-spinner" style="display:none">●●●</span>
+            </button>
+          </div>
+          <p class="github-hint" id="fetchStatus"></p>
+        </div>
+
+        <div class="divider-label">or load a sample</div>
+
         <div class="samples-section">
-          <p class="samples-label">Load a sample PR</p>
           <div class="sample-buttons" id="sampleButtons">
             <span class="loading-text">Loading samples...</span>
           </div>

@@ -199,6 +199,52 @@ main {
 .divider-label::before { left: 20px; }
 .divider-label::after  { right: 20px; }
 
+/* ── GitHub URL input ────────────────────────────────────────────────────── */
+
+.github-section {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.github-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.github-input-row input {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.btn-fetch {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-fetch:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); }
+.btn-fetch:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.github-hint {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  min-height: 16px;
+  color: var(--text-muted);
+}
+
+.github-hint.error { color: var(--red); }
+.github-hint.success { color: var(--green); }
+
 /* ── Form ────────────────────────────────────────────────────────────────── */
 
 form {
