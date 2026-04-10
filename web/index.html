@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Code Review Pipeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="header-logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">CodeReview<span class="logo-accent">AI</span></span>
+      </div>
+      <p class="header-subtitle">Multi-agent pipeline that reviews pull requests like a senior engineer</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="layout">
+
+      <!-- ── Input Panel ───────────────────────────────────────────── -->
+      <section class="panel panel-input">
+        <div class="panel-header">
+          <h2>Pull Request</h2>
+        </div>
+
+        <div class="samples-section">
+          <p class="samples-label">Load a sample PR</p>
+          <div class="sample-buttons" id="sampleButtons">
+            <span class="loading-text">Loading samples...</span>
+          </div>
+        </div>
+
+        <div class="divider-label">or enter your own</div>
+
+        <form id="prForm">
+          <div class="field">
+            <label for="prTitle">PR Title <span class="required">*</span></label>
+            <input type="text" id="prTitle" placeholder="e.g. Add user authentication with JWT">
+          </div>
+
+          <div class="field">
+            <label for="prDescription">Description</label>
+            <textarea id="prDescription" rows="2" placeholder="What does this PR do? (optional)"></textarea>
+          </div>
+
+          <div class="files-section">
+            <div class="files-header">
+              <label>Changed Files <span class="required">*</span></label>
+            </div>
+            <div id="filesContainer"></div>
+            <button type="button" class="btn-ghost" id="addFileBtn">+ Add file</button>
+          </div>
+
+          <button type="submit" class="btn-primary" id="runBtn">
+            <span class="btn-text">Run Review</span>
+            <span class="btn-spinner" style="display:none">●●●</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- ── Output Panel ──────────────────────────────────────────── -->
+      <section class="panel panel-output" id="outputPanel">
+        <div class="panel-header">
+          <h2>Review</h2>
+          <button class="btn-copy" id="copyBtn" style="display:none">Copy</button>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+          <div class="empty-icon">⬡</div>
+          <p>Load a sample PR and click <strong>Run Review</strong></p>
+          <p class="empty-sub">Three specialized agents will analyze the code in real time</p>
+        </div>
+
+        <div id="pipeline" style="display:none">
+          <div class="pipeline-steps">
+            <div class="pipeline-step" id="step-planning">
+              <div class="step-indicator"></div>
+              <div class="step-body">
+                <div class="step-title">Planner Agent</div>
+                <div class="step-message"></div>
+                <div class="step-data" style="display:none"></div>
+              </div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="pipeline-step" id="step-analyzing">
+              <div class="step-indicator"></div>
+              <div class="step-body">
+                <div class="step-title">Reviewer + Security Agents</div>
+                <div class="step-message"></div>
+                <div class="step-data" style="display:none"></div>
+              </div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="pipeline-step" id="step-synthesizing">
+              <div class="step-indicator"></div>
+              <div class="step-body">
+                <div class="step-title">Synthesizer Agent</div>
+                <div class="step-message"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="finalReview" style="display:none"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <p>Architected &amp; built by <strong>Your Name</strong> &bull; Powered by Claude AI &bull; <a href="https://github.com" target="_blank">GitHub</a></p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
