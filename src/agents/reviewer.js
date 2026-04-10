@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { MODELS } from '../config.js';
 
 const client = new Anthropic();
 
@@ -36,7 +37,7 @@ Return a JSON object with this exact shape:
 }`;
 
   const response = await client.messages.create({
-    model: 'claude-opus-4-6',
+    model: MODELS.reviewer,
     max_tokens: 2048,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: prompt }]

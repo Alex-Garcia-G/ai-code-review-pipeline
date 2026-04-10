@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { MODELS } from '../config.js';
 
 const client = new Anthropic();
 
@@ -39,7 +40,7 @@ Synthesize all findings into a final review. Return a JSON object with this exac
 }`;
 
   const response = await client.messages.create({
-    model: 'claude-opus-4-6',
+    model: MODELS.synthesizer,
     max_tokens: 2048,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: prompt }]
