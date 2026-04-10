@@ -4,8 +4,8 @@
   "description": "Multi-agent AI system that reviews pull requests like a senior engineer",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "start": "node --env-file=.env src/server.js",
+    "dev": "node --env-file=.env --watch src/server.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

@@ -1,11 +1,8 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { runPipeline } from './orchestrator.js';
 import { SAMPLE_PRS } from './sample-prs.js';
-
-dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -15,7 +12,7 @@ app.use(express.static(join(__dirname, '../web')));
 
 // ── Sample PR endpoints ────────────────────────────────────────────────────
 
-app.get('/api/samples', (req, res) => {
+app.get('/api/samples', (_req, res) => {
   res.json(SAMPLE_PRS.map(({ id, title, description }) => ({ id, title, description })));
 });
 
@@ -34,7 +31,6 @@ app.post('/api/review', async (req, res) => {
     return res.status(400).json({ error: 'title and at least one file are required' });
   }
 
-  // Stream progress back to the client via SSE
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
