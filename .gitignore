@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Review history (local data, not for version control)
+data/
+
 # Environment variables — NEVER commit API keys
 .env
 

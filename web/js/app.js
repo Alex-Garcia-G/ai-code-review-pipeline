@@ -7,6 +7,7 @@ let reviewText = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   loadSamples();
+  loadHistory();
   addFileBlock();
   document.getElementById('addFileBtn').addEventListener('click', addFileBlock);
   document.getElementById('prForm').addEventListener('submit', handleSubmit);
@@ -46,6 +47,59 @@ async function loadSample(id) {
   data.files.forEach(file => {
     addFileBlock(file.name, file.diff);
   });
+}
+
+// ── History sidebar ───────────────────────────────────────────────────────
+
+async function loadHistory() {
+  const list = document.getElementById('historyList');
+  const count = document.getElementById('historyCount');
+  try {
+    const entries = await fetch('/api/history').then(r => r.json());
+    if (!entries.length) return;
+
+    count.textContent = entries.length;
+    list.innerHTML = entries.map(e => `
+      <div class="history-item" data-id="${e.id}">
+        <div class="history-item-title">${escHtml(e.title)}</div>
+        <div class="history-item-meta">
+          <span class="history-verdict ${e.verdict}">${e.verdict === 'APPROVE' ? '✓' : e.verdict === 'REQUEST_CHANGES' ? '✗' : '◌'}</span>
+          <span class="history-date">${formatDate(e.timestamp)}</span>
+        </div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.history-item').forEach(item => {
+      item.addEventListener('click', () => loadHistoryEntry(item.dataset.id));
+    });
+  } catch {
+    // history panel fails silently — it's non-critical
+  }
+}
+
+async function loadHistoryEntry(id) {
+  try {
+    const entry = await fetch(`/api/history/${id}`).then(r => r.json());
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('pipeline').style.display = 'none';
+    document.getElementById('prTitle').value = entry.title;
+    renderFinalReview(entry.result.final_review);
+  } catch {
+    showError('Could not load this review.');
+  }
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now - d;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHrs = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHrs / 24);
+  if (diffMins < 1)  return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHrs < 24)  return `${diffHrs}h ago`;
+  return `${diffDays}d ago`;
 }
 
 // ── GitHub PR fetch ───────────────────────────────────────────────────────
@@ -200,6 +254,7 @@ function handleEvent(event) {
     updateStep(event.step, event.status, event.message, event.data);
   } else if (event.type === 'complete') {
     renderFinalReview(event.result.final_review);
+    loadHistory();
   } else if (event.type === 'error') {
     showError(event.message);
   }
