@@ -4,6 +4,7 @@ import { dirname, join } from 'path';
 import { runPipeline } from './orchestrator.js';
 import { SAMPLE_PRS } from './sample-prs.js';
 import { fetchPRData } from './github.js';
+import { saveReview, getHistory, getReviewById } from './history.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -37,6 +38,18 @@ app.get('/api/fetch-pr', async (req, res) => {
   }
 });
 
+// ── History endpoints ─────────────────────────────────────────────────────
+
+app.get('/api/history', (_req, res) => {
+  res.json(getHistory());
+});
+
+app.get('/api/history/:id', (req, res) => {
+  const entry = getReviewById(req.params.id);
+  if (!entry) return res.status(404).json({ error: 'Review not found' });
+  res.json(entry);
+});
+
 // ── Review pipeline endpoint (Server-Sent Events) ─────────────────────────
 
 app.post('/api/review', async (req, res) => {
@@ -59,6 +72,12 @@ app.post('/api/review', async (req, res) => {
       { title, description, files },
       (progress) => send({ type: 'progress', ...progress })
     );
+    saveReview({
+      title,
+      url: req.body.url || null,
+      verdict: result.final_review.verdict,
+      result
+    });
     send({ type: 'complete', result });
   } catch (err) {
     console.error('Pipeline error:', err);
