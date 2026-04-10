@@ -1,6 +1,8 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { config } from 'dotenv';
+config(); // no-op in production where env vars are injected by the platform
 import { runPipeline } from './orchestrator.js';
 import { SAMPLE_PRS } from './sample-prs.js';
 import { fetchPRData } from './github.js';
