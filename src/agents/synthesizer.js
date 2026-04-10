@@ -41,7 +41,7 @@ Synthesize all findings into a final review. Return a JSON object with this exac
 
   const response = await client.messages.create({
     model: MODELS.synthesizer,
-    max_tokens: 2048,
+    max_tokens: 6000,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: prompt }]
   });
@@ -51,5 +51,9 @@ Synthesize all findings into a final review. Return a JSON object with this exac
 
 function parseJSON(text) {
   const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    throw new Error('The synthesizer agent returned an incomplete response. This usually means the review was very large. Please try again.');
+  }
 }

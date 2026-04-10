@@ -42,7 +42,7 @@ Scan for security vulnerabilities. Return a JSON object with this exact shape:
 
   const response = await client.messages.create({
     model: MODELS.security,
-    max_tokens: 2048,
+    max_tokens: 4000,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: prompt }]
   });
@@ -52,5 +52,9 @@ Scan for security vulnerabilities. Return a JSON object with this exact shape:
 
 function parseJSON(text) {
   const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    throw new Error('The security agent returned an incomplete response. Please try again.');
+  }
 }
