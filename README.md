@@ -2,6 +2,8 @@
 
 A multi-agent system that reviews pull requests like a senior engineer. Four specialized AI agents work in a coordinated pipeline — one plans the review, two analyze code in parallel, and one synthesizes a final verdict.
 
+**Live demo:** [ai-code-review-pipeline-production.up.railway.app](https://ai-code-review-pipeline-production.up.railway.app)
+
 ![Demo](docs/demo.gif)
 <!-- Replace with a real screenshot or screen recording once you have one -->
 
