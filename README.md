@@ -47,7 +47,7 @@ Each agent has a focused system prompt and communicates via structured JSON. The
 
 - **Runtime:** Node.js (ES modules)
 - **Server:** Express with Server-Sent Events for live streaming
-- **AI:** [Anthropic Claude API](https://www.anthropic.com) — one model call per agent
+- **AI:** [Anthropic Claude API](https://www.anthropic.com) — 4 specialized agents, each making one focused Claude API call
 - **Frontend:** Vanilla HTML/CSS/JS — no build step, no framework
 
 ---
