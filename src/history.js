@@ -1,50 +1,27 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { randomUUID } from 'crypto';
+import pool, { initDb } from './db.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, '../data');
-const HISTORY_FILE = join(DATA_DIR, 'reviews.json');
-const MAX_ENTRIES = 50;
+await initDb();
 
-function ensureDataDir() {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
+export async function saveReview({ title, url, verdict, result }) {
+  const id = randomUUID();
+  await pool.query(
+    `INSERT INTO reviews (id, title, url, verdict, result) VALUES ($1, $2, $3, $4, $5)`,
+    [id, title, url || null, verdict, result]
+  );
 }
 
-function readAll() {
-  ensureDataDir();
-  if (!existsSync(HISTORY_FILE)) return [];
-  try {
-    return JSON.parse(readFileSync(HISTORY_FILE, 'utf8'));
-  } catch {
-    return [];
-  }
+export async function getHistory() {
+  const { rows } = await pool.query(
+    `SELECT id, title, url, verdict, timestamp FROM reviews ORDER BY timestamp DESC LIMIT 50`
+  );
+  return rows;
 }
 
-function writeAll(entries) {
-  ensureDataDir();
-  writeFileSync(HISTORY_FILE, JSON.stringify(entries, null, 2), 'utf8');
-}
-
-export function saveReview({ title, url, verdict, result }) {
-  const entries = readAll();
-  entries.unshift({
-    id: Date.now().toString(),
-    timestamp: new Date().toISOString(),
-    title,
-    url: url || null,
-    verdict,
-    result
-  });
-  writeAll(entries.slice(0, MAX_ENTRIES));
-}
-
-export function getHistory() {
-  return readAll().map(({ id, timestamp, title, url, verdict }) => ({
-    id, timestamp, title, url, verdict
-  }));
-}
-
-export function getReviewById(id) {
-  return readAll().find(e => e.id === id) || null;
+export async function getReviewById(id) {
+  const { rows } = await pool.query(
+    `SELECT * FROM reviews WHERE id = $1`,
+    [id]
+  );
+  return rows[0] || null;
 }
