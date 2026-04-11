@@ -42,3 +42,4 @@ Agent communication is JSON. Each agent has a strict system prompt and returns s
 ## Rules
 
 - Always commit code changes to GitHub — every feature, fix, or refactor gets a commit with a conventional commit message (`feat:`, `fix:`, `chore:`, etc.).
+- Only commit once the fix is confirmed working — do not commit speculatively. Wait for the user to verify before committing.
