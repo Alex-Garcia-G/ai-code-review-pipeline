@@ -471,6 +471,20 @@ input::placeholder, textarea::placeholder {
 
 .btn-copy:hover { color: var(--text); border-color: var(--text-muted); }
 
+.btn-clear {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.btn-clear:hover { color: var(--red); border-color: var(--red); }
+
 .btn-spinner {
   font-family: var(--font-mono);
   animation: blink 1s step-end infinite;

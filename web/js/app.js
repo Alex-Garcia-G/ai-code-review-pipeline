@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('addFileBtn').addEventListener('click', addFileBlock);
   document.getElementById('prForm').addEventListener('submit', handleSubmit);
   document.getElementById('copyBtn').addEventListener('click', copyReview);
+  document.getElementById('clearBtn').addEventListener('click', clearReview);
   document.getElementById('fetchBtn').addEventListener('click', handleFetchPR);
 });
 
@@ -375,6 +376,7 @@ function renderFinalReview(review) {
 
   container.style.display = 'block';
   document.getElementById('copyBtn').style.display = 'block';
+  document.getElementById('clearBtn').style.display = 'block';
 
   // Build plain text version for clipboard
   reviewText = buildPlainText(review);
@@ -416,6 +418,14 @@ function copyReview() {
     btn.textContent = 'Copied!';
     setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
   });
+}
+
+function clearReview() {
+  resetOutput();
+  document.getElementById('emptyState').style.display = 'block';
+  document.getElementById('copyBtn').style.display = 'none';
+  document.getElementById('clearBtn').style.display = 'none';
+  reviewText = '';
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────
