@@ -6,7 +6,7 @@ config(); // no-op in production where env vars are injected by the platform
 import { runPipeline } from './orchestrator.js';
 import { SAMPLE_PRS } from './sample-prs.js';
 import { fetchPRData } from './github.js';
-import { saveReview, getHistory, getReviewById } from './history.js';
+import { saveReview, getHistory, getReviewById, setupHistory } from './history.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -42,12 +42,12 @@ app.get('/api/fetch-pr', async (req, res) => {
 
 // ── History endpoints ─────────────────────────────────────────────────────
 
-app.get('/api/history', (_req, res) => {
-  res.json(getHistory());
+app.get('/api/history', async (_req, res) => {
+  res.json(await getHistory());
 });
 
-app.get('/api/history/:id', (req, res) => {
-  const entry = getReviewById(req.params.id);
+app.get('/api/history/:id', async (req, res) => {
+  const entry = await getReviewById(req.params.id);
   if (!entry) return res.status(404).json({ error: 'Review not found' });
   res.json(entry);
 });
@@ -94,4 +94,5 @@ app.post('/api/review', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`\nAI Code Review Pipeline running at http://localhost:${PORT}\n`);
+  setupHistory();
 });

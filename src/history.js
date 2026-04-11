@@ -1,10 +1,13 @@
 import { randomUUID } from 'crypto';
 import pool, { initDb } from './db.js';
 
-try {
-  await initDb();
-} catch (err) {
-  console.error('Database not available — history will be disabled:', err.message);
+export async function setupHistory() {
+  try {
+    await initDb();
+    console.log('Database ready.');
+  } catch (err) {
+    console.error('Database not available — history will be disabled:', err.message);
+  }
 }
 
 export async function saveReview({ title, url, verdict, result }) {
