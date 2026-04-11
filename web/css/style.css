@@ -796,3 +796,183 @@ footer {
 
 .footer-inner a { color: var(--text-muted); text-decoration: none; }
 .footer-inner a:hover { color: var(--blue); }
+
+/* ── Settings gear button ────────────────────────────────────────────────── */
+
+.btn-settings {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.btn-settings:hover { color: var(--text); }
+
+/* ── Settings modal overlay ──────────────────────────────────────────────── */
+
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.settings-modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-header h2 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.settings-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+}
+
+.settings-close:hover { color: var(--text); }
+
+.settings-section {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.settings-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.settings-profile-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.settings-profile-username {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.settings-field {
+  margin-bottom: 20px;
+}
+
+.settings-field:last-child { margin-bottom: 0; }
+
+.settings-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.settings-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* ── Toggle button group ─────────────────────────────────────────────────── */
+
+.toggle-group {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.toggle-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-family: var(--font-ui);
+  padding: 7px 8px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toggle-btn:last-child { border-right: none; }
+
+.toggle-btn:hover { background: var(--bg-hover); color: var(--text); }
+
+.toggle-btn.active {
+  background: var(--blue);
+  color: #fff;
+  font-weight: 500;
+}
+
+/* ── Danger zone ─────────────────────────────────────────────────────────── */
+
+.btn-danger {
+  background: none;
+  border: 1px solid var(--red);
+  color: var(--red);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-family: var(--font-ui);
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-danger:hover { background: var(--red-bg); }
+
+/* ── Settings footer ─────────────────────────────────────────────────────── */
+
+.settings-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px;
+}

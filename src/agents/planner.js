@@ -13,13 +13,27 @@ Given a PR's title, description, and changed files, determine:
 
 Always respond with valid JSON only. No markdown, no explanation outside the JSON.`;
 
-export async function planReview({ title, description, files }) {
+export async function planReview({ title, description, files }, settings = {}) {
   const fileList = files.map(f => `- ${f.name} (${f.language || 'unknown'})`).join('\n');
   const diffs = files.map(f => `=== ${f.name} ===\n${f.diff}`).join('\n\n');
 
+  const strictnessNote = settings.strictness === 'lenient'
+    ? 'Be lenient in your review — flag only clear bugs or serious issues, not minor style concerns.'
+    : settings.strictness === 'strict'
+    ? 'Be strict in your review — flag all potential issues including style, naming, and minor logic concerns.'
+    : '';
+
+  const focusNote = settings.focus === 'security'
+    ? 'Prioritize security findings above all else. Always include "security" in concerns.'
+    : settings.focus === 'quality'
+    ? 'Prioritize code quality, readability, and maintainability over security concerns.'
+    : '';
+
+  const settingsContext = [strictnessNote, focusNote].filter(Boolean).join(' ');
+
   const prompt = `PR Title: ${title}
 PR Description: ${description || 'No description provided.'}
-
+${settingsContext ? `\nReview preferences: ${settingsContext}` : ''}
 Changed files:
 ${fileList}
 

@@ -25,6 +25,7 @@
         <div class="user-info" id="userInfo" style="display:none">
           <img class="user-avatar" id="userAvatar" src="" alt="">
           <span class="user-name" id="userName"></span>
+          <button class="btn-settings" id="settingsBtn" title="Settings">⚙</button>
           <a href="/auth/logout" class="user-signout">Sign out</a>
         </div>
       </div>
@@ -154,6 +155,68 @@
       <p>Architected &amp; built by <strong>Alexander Wheeler-Garcia</strong> &bull; Powered by Claude AI &bull; <a href="https://github.com/Alex-Garcia-G/ai-code-review-pipeline" target="_blank">GitHub</a></p>
     </div>
   </footer>
+
+  <!-- ── Settings Modal ──────────────────────────────────────────────────── -->
+  <div id="settingsOverlay" class="settings-overlay" style="display:none">
+    <div class="settings-modal">
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button class="settings-close" id="settingsClose">✕</button>
+      </div>
+
+      <!-- Profile -->
+      <div class="settings-section">
+        <div class="settings-section-title">Profile</div>
+        <div class="settings-profile">
+          <img class="settings-avatar" id="settingsAvatar" src="" alt="">
+          <div class="settings-profile-info">
+            <div class="settings-profile-name" id="settingsName"></div>
+            <div class="settings-profile-username" id="settingsUsername"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review Preferences -->
+      <div class="settings-section">
+        <div class="settings-section-title">Review Preferences</div>
+
+        <div class="settings-field">
+          <label class="settings-label">Strictness</label>
+          <p class="settings-hint">How critical the agents are when reviewing code</p>
+          <div class="toggle-group" id="strictnessGroup">
+            <button class="toggle-btn" data-value="lenient">Lenient</button>
+            <button class="toggle-btn active" data-value="balanced">Balanced</button>
+            <button class="toggle-btn" data-value="strict">Strict</button>
+          </div>
+        </div>
+
+        <div class="settings-field">
+          <label class="settings-label">Focus</label>
+          <p class="settings-hint">What the agents prioritize in their review</p>
+          <div class="toggle-group" id="focusGroup">
+            <button class="toggle-btn" data-value="security">Security-heavy</button>
+            <button class="toggle-btn active" data-value="balanced">Balanced</button>
+            <button class="toggle-btn" data-value="quality">Quality-heavy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Management -->
+      <div class="settings-section">
+        <div class="settings-section-title">Data</div>
+        <div class="settings-field">
+          <label class="settings-label">Review History</label>
+          <p class="settings-hint">Permanently delete all your past reviews</p>
+          <button class="btn-danger" id="clearHistoryBtn">Clear all history</button>
+        </div>
+      </div>
+
+      <div class="settings-footer">
+        <button class="btn-ghost" id="settingsCancel">Cancel</button>
+        <button class="btn-primary" id="settingsSave">Save changes</button>
+      </div>
+    </div>
+  </div>
 
   <script src="js/app.js"></script>
 </body>

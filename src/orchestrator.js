@@ -14,12 +14,12 @@ import { synthesizeReview } from './agents/synthesizer.js';
  * @param {object} prData  - { title, description, files: [{name, language, diff}] }
  * @param {function} onProgress - called with progress events as each stage completes
  */
-export async function runPipeline(prData, onProgress = () => {}) {
+export async function runPipeline(prData, onProgress = () => {}, settings = {}) {
 
   // ── Stage 1: Plan ──────────────────────────────────────────────────────────
   onProgress({ step: 'planning', status: 'running', message: 'Analyzing PR structure...' });
 
-  const plan = await planReview(prData);
+  const plan = await planReview(prData, settings);
 
   onProgress({ step: 'planning', status: 'done', data: plan });
 

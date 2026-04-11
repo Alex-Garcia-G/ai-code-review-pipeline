@@ -10,12 +10,12 @@ export async function setupHistory() {
   }
 }
 
-export async function saveReview({ title, url, verdict, result }) {
+export async function saveReview({ title, url, verdict, result, userId }) {
   try {
     const id = randomUUID();
     await pool.query(
-      `INSERT INTO reviews (id, title, url, verdict, result) VALUES ($1, $2, $3, $4, $5)`,
-      [id, title, url || null, verdict, result]
+      `INSERT INTO reviews (id, user_id, title, url, verdict, result) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [id, userId || null, title, url || null, verdict, result]
     );
   } catch (err) {
     console.error('Could not save review to database:', err.message);
@@ -42,5 +42,15 @@ export async function getReviewById(id) {
     return rows[0] || null;
   } catch {
     return null;
+  }
+}
+
+export async function clearHistory(userId) {
+  try {
+    if (userId) {
+      await pool.query(`DELETE FROM reviews WHERE user_id = $1`, [userId]);
+    }
+  } catch (err) {
+    console.error('Could not clear history:', err.message);
   }
 }

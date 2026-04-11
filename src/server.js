@@ -7,7 +7,8 @@ config(); // no-op in production where env vars are injected by the platform
 import { runPipeline } from './orchestrator.js';
 import { SAMPLE_PRS } from './sample-prs.js';
 import { fetchPRData } from './github.js';
-import { saveReview, getHistory, getReviewById, setupHistory } from './history.js';
+import { saveReview, getHistory, getReviewById, setupHistory, clearHistory } from './history.js';
+import pool from './db.js';
 import { startOAuth, handleCallback, requireAuth } from './auth.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -76,10 +77,44 @@ app.get('/api/history/:id', async (req, res) => {
   res.json(entry);
 });
 
+app.delete('/api/history', requireAuth, async (req, res) => {
+  await clearHistory(req.session.user.id);
+  res.json({ ok: true });
+});
+
+// ── Settings endpoints ────────────────────────────────────────────────────
+
+app.get('/api/settings', requireAuth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT strictness, focus FROM user_settings WHERE user_id = $1',
+      [req.session.user.id]
+    );
+    res.json(rows[0] || { strictness: 'balanced', focus: 'balanced' });
+  } catch {
+    res.json({ strictness: 'balanced', focus: 'balanced' });
+  }
+});
+
+app.put('/api/settings', requireAuth, async (req, res) => {
+  const { strictness, focus } = req.body;
+  try {
+    await pool.query(
+      `INSERT INTO user_settings (user_id, strictness, focus)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (user_id) DO UPDATE SET strictness = $2, focus = $3, updated_at = NOW()`,
+      [req.session.user.id, strictness, focus]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Review pipeline endpoint (Server-Sent Events) ─────────────────────────
 
 app.post('/api/review', requireAuth, async (req, res) => {
-  const { title, description, files } = req.body;
+  const { title, description, files, settings } = req.body;
 
   if (!title || !Array.isArray(files) || files.length === 0) {
     return res.status(400).json({ error: 'title and at least one file are required' });
@@ -96,13 +131,15 @@ app.post('/api/review', requireAuth, async (req, res) => {
   try {
     const result = await runPipeline(
       { title, description, files },
-      (progress) => send({ type: 'progress', ...progress })
+      (progress) => send({ type: 'progress', ...progress }),
+      settings
     );
     saveReview({
       title,
       url: req.body.url || null,
       verdict: result.final_review.verdict,
-      result
+      result,
+      userId: req.session.user.id
     });
     send({ type: 'complete', result });
   } catch (err) {

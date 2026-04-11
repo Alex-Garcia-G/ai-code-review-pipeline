@@ -2,6 +2,7 @@
 
 let fileCount = 0;
 let reviewText = '';
+let userSettings = { strictness: 'balanced', focus: 'balanced' };
 
 // ── Init ──────────────────────────────────────────────────────────────────
 
@@ -12,6 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('copyBtn').addEventListener('click', copyReview);
   document.getElementById('clearBtn').addEventListener('click', clearReview);
   document.getElementById('fetchBtn').addEventListener('click', handleFetchPR);
+  document.getElementById('settingsBtn').addEventListener('click', openSettings);
+  document.getElementById('settingsClose').addEventListener('click', closeSettings);
+  document.getElementById('settingsCancel').addEventListener('click', closeSettings);
+  document.getElementById('settingsSave').addEventListener('click', saveSettings);
+  document.getElementById('clearHistoryBtn').addEventListener('click', clearHistoryWithConfirm);
+  document.getElementById('settingsOverlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeSettings();
+  });
+  setupToggleGroups();
 });
 
 // ── Auth ──────────────────────────────────────────────────────────────────
@@ -26,6 +36,13 @@ async function initAuth() {
       document.getElementById('userAvatar').src = user.avatar_url;
       document.getElementById('userAvatar').alt = user.username;
       document.getElementById('userName').textContent = user.name || user.username;
+
+      // Populate settings modal profile
+      document.getElementById('settingsAvatar').src = user.avatar_url;
+      document.getElementById('settingsName').textContent = user.name || user.username;
+      document.getElementById('settingsUsername').textContent = `@${user.username}`;
+
+      await loadSettings();
       loadSamples();
       loadHistory();
       addFileBlock();
@@ -33,6 +50,82 @@ async function initAuth() {
   } catch {
     // auth check failed silently — login button stays visible
   }
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────
+
+async function loadSettings() {
+  try {
+    const s = await fetch('/api/settings').then(r => r.ok ? r.json() : null);
+    if (s) {
+      userSettings = s;
+      applyToggleSelection('strictnessGroup', s.strictness);
+      applyToggleSelection('focusGroup', s.focus);
+    }
+  } catch {
+    // settings load failed — defaults stay
+  }
+}
+
+function openSettings() {
+  document.getElementById('settingsOverlay').style.display = 'flex';
+}
+
+function closeSettings() {
+  document.getElementById('settingsOverlay').style.display = 'none';
+}
+
+async function saveSettings() {
+  const strictness = getToggleValue('strictnessGroup');
+  const focus = getToggleValue('focusGroup');
+
+  try {
+    await fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ strictness, focus })
+    });
+    userSettings = { strictness, focus };
+    closeSettings();
+  } catch {
+    alert('Could not save settings. Please try again.');
+  }
+}
+
+async function clearHistoryWithConfirm() {
+  if (!confirm('Delete all your review history? This cannot be undone.')) return;
+  try {
+    await fetch('/api/history', { method: 'DELETE' });
+    closeSettings();
+    document.getElementById('historyList').innerHTML = '<p class="empty-history">No reviews yet</p>';
+    document.getElementById('historyCount').textContent = '';
+  } catch {
+    alert('Could not clear history. Please try again.');
+  }
+}
+
+function setupToggleGroups() {
+  ['strictnessGroup', 'focusGroup'].forEach(groupId => {
+    const group = document.getElementById(groupId);
+    group.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  });
+}
+
+function applyToggleSelection(groupId, value) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.value === value);
+  });
+}
+
+function getToggleValue(groupId) {
+  const active = document.getElementById(groupId).querySelector('.toggle-btn.active');
+  return active ? active.dataset.value : 'balanced';
 }
 
 // ── Sample PRs ────────────────────────────────────────────────────────────
@@ -223,7 +316,7 @@ async function handleSubmit(e) {
   showPipeline();
 
   try {
-    await streamReview({ title, description, files });
+    await streamReview({ title, description, files, settings: userSettings });
   } catch (err) {
     showError(err.message);
   } finally {
