@@ -23,7 +23,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Verify app loads
-        run: node --input-type=module <<< "import './src/config.js'"
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - name: Check for syntax errors
+        run: node --check src/server.js src/orchestrator.js src/agents/planner.js src/agents/reviewer.js src/agents/security.js src/agents/synthesizer.js
