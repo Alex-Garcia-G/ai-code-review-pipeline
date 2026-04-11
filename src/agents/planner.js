@@ -49,5 +49,9 @@ Return a JSON object with this exact shape:
 
 function parseJSON(text) {
   const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    throw new Error('The planner agent returned an incomplete response. Please try again.');
+  }
 }

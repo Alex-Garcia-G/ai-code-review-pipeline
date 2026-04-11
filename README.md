@@ -57,7 +57,7 @@ Each agent has a focused system prompt and communicates via structured JSON. The
 **Prerequisites:** Node.js 18+, an [Anthropic API key](https://console.anthropic.com)
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ai-code-review-pipeline
+git clone https://github.com/Alex-Garcia-G/ai-code-review-pipeline
 cd ai-code-review-pipeline
 npm install
 
