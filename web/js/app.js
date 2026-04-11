@@ -6,15 +6,34 @@ let reviewText = '';
 // ── Init ──────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadSamples();
-  loadHistory();
-  addFileBlock();
+  initAuth();
   document.getElementById('addFileBtn').addEventListener('click', addFileBlock);
   document.getElementById('prForm').addEventListener('submit', handleSubmit);
   document.getElementById('copyBtn').addEventListener('click', copyReview);
   document.getElementById('clearBtn').addEventListener('click', clearReview);
   document.getElementById('fetchBtn').addEventListener('click', handleFetchPR);
 });
+
+// ── Auth ──────────────────────────────────────────────────────────────────
+
+async function initAuth() {
+  try {
+    const user = await fetch('/api/me').then(r => r.ok ? r.json() : null);
+    if (user) {
+      document.getElementById('loginBtn').style.display = 'none';
+      const userInfo = document.getElementById('userInfo');
+      userInfo.style.display = 'flex';
+      document.getElementById('userAvatar').src = user.avatar_url;
+      document.getElementById('userAvatar').alt = user.username;
+      document.getElementById('userName').textContent = user.name || user.username;
+      loadSamples();
+      loadHistory();
+      addFileBlock();
+    }
+  } catch {
+    // auth check failed silently — login button stays visible
+  }
+}
 
 // ── Sample PRs ────────────────────────────────────────────────────────────
 

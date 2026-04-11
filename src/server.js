@@ -1,4 +1,5 @@
 import express from 'express';
+import session from 'express-session';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { config } from 'dotenv';
@@ -7,12 +8,35 @@ import { runPipeline } from './orchestrator.js';
 import { SAMPLE_PRS } from './sample-prs.js';
 import { fetchPRData } from './github.js';
 import { saveReview, getHistory, getReviewById, setupHistory } from './history.js';
+import { startOAuth, handleCallback, requireAuth } from './auth.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  }
+}));
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static(join(__dirname, '../web')));
+
+// ── Auth endpoints ────────────────────────────────────────────────────────
+
+app.get('/auth/github', startOAuth);
+app.get('/auth/github/callback', handleCallback);
+app.get('/auth/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
+});
+app.get('/api/me', (req, res) => {
+  if (!req.session?.user) return res.status(401).json({ error: 'Not authenticated' });
+  res.json(req.session.user);
+});
 
 // ── Sample PR endpoints ────────────────────────────────────────────────────
 
@@ -54,7 +78,7 @@ app.get('/api/history/:id', async (req, res) => {
 
 // ── Review pipeline endpoint (Server-Sent Events) ─────────────────────────
 
-app.post('/api/review', async (req, res) => {
+app.post('/api/review', requireAuth, async (req, res) => {
   const { title, description, files } = req.body;
 
   if (!title || !Array.isArray(files) || files.length === 0) {

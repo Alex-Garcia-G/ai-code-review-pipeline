@@ -8,6 +8,15 @@ const pool = new Pool({
 
 export async function initDb() {
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id         TEXT        PRIMARY KEY,
+      username   TEXT        NOT NULL,
+      name       TEXT,
+      avatar_url TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS reviews (
       id        TEXT        PRIMARY KEY,
       title     TEXT        NOT NULL,
