@@ -2,6 +2,7 @@ import { planReview } from './agents/planner.js';
 import { reviewFile } from './agents/reviewer.js';
 import { securityScan } from './agents/security.js';
 import { synthesizeReview } from './agents/synthesizer.js';
+import { withRetry } from './utils.js';
 
 /**
  * Runs the full multi-agent code review pipeline.
@@ -19,7 +20,7 @@ export async function runPipeline(prData, onProgress = () => {}, settings = {}) 
   // ── Stage 1: Plan ──────────────────────────────────────────────────────────
   onProgress({ step: 'planning', status: 'running', message: 'Analyzing PR structure...' });
 
-  const plan = await planReview(prData, settings);
+  const plan = await withRetry(() => planReview(prData, settings));
 
   onProgress({ step: 'planning', status: 'done', data: plan });
 
@@ -40,13 +41,22 @@ export async function runPipeline(prData, onProgress = () => {}, settings = {}) 
 
   const fileAnalyses = await Promise.all(
     filesToReview.map(async (file) => {
-      const [reviewResult, securityResult] = await Promise.all([
-        reviewFile({ file, concerns: plan.concerns, context: plan.context }),
-        shouldScanSecurity
-          ? securityScan({ file })
-          : Promise.resolve({ file: file.name, has_issues: false, findings: [] })
-      ]);
-      return { file: file.name, reviewResult, securityResult };
+      try {
+        const [reviewResult, securityResult] = await Promise.all([
+          withRetry(() => reviewFile({ file, concerns: plan.concerns, context: plan.context })),
+          shouldScanSecurity
+            ? withRetry(() => securityScan({ file }))
+            : Promise.resolve({ file: file.name, has_issues: false, findings: [] })
+        ]);
+        return { file: file.name, reviewResult, securityResult };
+      } catch (err) {
+        console.error(`Agent failed for ${file.name} after retries:`, err.message);
+        return {
+          file: file.name,
+          reviewResult: { file: file.name, verdict: 'error', issues: [], summary: `Analysis failed: ${err.message}` },
+          securityResult: { file: file.name, has_issues: false, findings: [] }
+        };
+      }
     })
   );
 
@@ -59,7 +69,7 @@ export async function runPipeline(prData, onProgress = () => {}, settings = {}) 
     .map(a => a.securityResult)
     .filter(s => s.has_issues);
 
-  const finalReview = await synthesizeReview({
+  const finalReview = await withRetry(() => synthesizeReview({
     pr_info: {
       title: prData.title,
       description: prData.description,
@@ -67,7 +77,7 @@ export async function runPipeline(prData, onProgress = () => {}, settings = {}) 
     },
     reviewer_outputs: fileAnalyses.map(a => a.reviewResult),
     security_outputs: securityFindings
-  });
+  }));
 
   onProgress({ step: 'synthesizing', status: 'done', data: finalReview });
 
