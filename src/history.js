@@ -22,10 +22,11 @@ export async function saveReview({ title, url, verdict, result, userId }) {
   }
 }
 
-export async function getHistory() {
+export async function getHistory(userId) {
   try {
     const { rows } = await pool.query(
-      `SELECT id, title, url, verdict, timestamp FROM reviews ORDER BY timestamp DESC LIMIT 50`
+      `SELECT id, title, url, verdict, timestamp FROM reviews WHERE user_id = $1 ORDER BY timestamp DESC LIMIT 50`,
+      [userId]
     );
     return rows;
   } catch {

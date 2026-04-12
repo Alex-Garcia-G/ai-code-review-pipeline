@@ -67,8 +67,8 @@ app.get('/api/fetch-pr', async (req, res) => {
 
 // ── History endpoints ─────────────────────────────────────────────────────
 
-app.get('/api/history', async (_req, res) => {
-  res.json(await getHistory());
+app.get('/api/history', requireAuth, async (req, res) => {
+  res.json(await getHistory(req.session.user.id));
 });
 
 app.get('/api/history/:id', async (req, res) => {
