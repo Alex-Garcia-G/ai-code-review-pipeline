@@ -108,7 +108,7 @@ SSE gives the UI live progress as each stage completes without the overhead of W
 
 ## Roadmap
 
-- [ ] GitHub API integration (review real PRs by URL)
 - [ ] Webhook support (auto-trigger on PR open)
 - [ ] Per-language specialist agents (Python, SQL, etc.)
-- [ ] Review history / persistence
+- [ ] Export review as a GitHub PR comment (post directly to GitHub)
+- [ ] OAuth support for private repos
