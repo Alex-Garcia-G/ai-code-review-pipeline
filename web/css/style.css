@@ -12,7 +12,7 @@
 
   --text:         #e6edf3;
   --text-muted:   #8b949e;
-  --text-faint:   #484f58;
+  --text-faint:   #6e7681;
 
   --blue:         #58a6ff;
   --green:        #3fb950;
@@ -34,6 +34,7 @@ html { font-size: 14px; }
 body {
   font-family: var(--font-ui);
   background: var(--bg);
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(88, 166, 255, 0.04) 0%, transparent 60%);
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
@@ -53,7 +54,7 @@ body {
 header {
   border-bottom: 1px solid var(--border);
   padding: 16px 24px;
-  background: var(--bg-panel);
+  background: linear-gradient(180deg, #1c2128 0%, var(--bg-panel) 100%);
 }
 
 .header-inner {
@@ -140,6 +141,12 @@ header {
 main {
   flex: 1;
   padding: 24px;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .layout {
@@ -163,7 +170,7 @@ main {
 /* ── Panels ──────────────────────────────────────────────────────────────── */
 
 .panel {
-  background: var(--bg-panel);
+  background: linear-gradient(180deg, #1a1f27 0%, var(--bg-panel) 60px);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -244,7 +251,7 @@ main {
 
 .divider-label {
   text-align: center;
-  color: var(--text-faint);
+  color: var(--text-muted);
   font-size: 0.75rem;
   padding: 12px 20px;
   position: relative;
@@ -274,6 +281,25 @@ main {
   color: var(--text-faint);
   font-size: 0.8rem;
   text-align: center;
+}
+
+.skeleton-item {
+  height: 54px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, var(--bg-panel) 25%, var(--bg-hover) 50%, var(--bg-panel) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.file-size-warning {
+  font-size: 0.73rem;
+  color: var(--yellow);
+  margin-top: 4px;
 }
 
 .history-item {
@@ -575,8 +601,16 @@ input::placeholder, textarea::placeholder {
 
 .empty-icon {
   font-size: 2.5rem;
-  color: var(--text-faint);
+  color: var(--blue);
+  opacity: 0.4;
   margin-bottom: 16px;
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
 }
 
 .empty-state p { margin-bottom: 6px; font-size: 0.9rem; }
@@ -604,6 +638,10 @@ input::placeholder, textarea::placeholder {
   height: 20px;
   background: var(--border);
   margin-left: 10px;
+  margin-top: -3px;
+  margin-bottom: -3px;
+  position: relative;
+  z-index: 0;
   transition: background 0.3s;
 }
 
@@ -624,6 +662,8 @@ input::placeholder, textarea::placeholder {
   align-items: center;
   justify-content: center;
   font-size: 0.6rem;
+  position: relative;
+  z-index: 1;
 }
 
 .pipeline-step.running .step-indicator {

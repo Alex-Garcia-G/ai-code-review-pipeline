@@ -22,11 +22,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === e.currentTarget) closeSettings();
   });
   setupToggleGroups();
+
+  // Restore last PR URL
+  const lastUrl = localStorage.getItem('lastPrUrl');
+  if (lastUrl) document.getElementById('prUrl').value = lastUrl;
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSettings();
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      document.getElementById('prForm').requestSubmit();
+    }
+  });
 });
 
 // ── Auth ──────────────────────────────────────────────────────────────────
 
 async function initAuth() {
+  // Disable sign-in button while navigating to GitHub
+  document.getElementById('loginBtn').addEventListener('click', function () {
+    this.textContent = 'Signing in…';
+    this.style.pointerEvents = 'none';
+    this.style.opacity = '0.6';
+  });
+
   try {
     const user = await fetch('/api/me').then(r => r.ok ? r.json() : null);
     if (user) {
@@ -41,6 +60,9 @@ async function initAuth() {
       document.getElementById('settingsAvatar').src = user.avatar_url;
       document.getElementById('settingsName').textContent = user.name || user.username;
       document.getElementById('settingsUsername').textContent = `@${user.username}`;
+
+      // Update empty state for logged-in users
+      document.getElementById('emptyStateMsg').innerHTML = 'Load a sample PR and click <strong>Run Review</strong>';
 
       await loadSettings();
       loadSamples();
@@ -167,6 +189,10 @@ async function loadSample(id) {
 async function loadHistory() {
   const list = document.getElementById('historyList');
   const count = document.getElementById('historyCount');
+
+  // Show skeleton while loading
+  list.innerHTML = '<div class="skeleton-item"></div><div class="skeleton-item"></div><div class="skeleton-item"></div>';
+
   try {
     const entries = await fetch('/api/history').then(r => r.json());
     if (!entries.length) return;
@@ -247,6 +273,7 @@ async function handleFetchPR() {
 
     status.textContent = `Loaded ${data.files.length} file${data.files.length !== 1 ? 's' : ''} from GitHub`;
     status.className = 'github-hint success';
+    localStorage.setItem('lastPrUrl', url);
   } catch (err) {
     status.textContent = err.message;
     status.className = 'github-hint error';
@@ -272,8 +299,14 @@ function addFileBlock(name = '', diff = '') {
     </div>
     <input type="text" class="file-name" placeholder="src/auth.js" value="${escHtml(name)}">
     <textarea class="file-diff" rows="8" placeholder="Paste the file diff here...">${escHtml(diff)}</textarea>
+    <div class="file-size-warning" style="display:none">Large diff — analysis may take longer</div>
   `;
   container.appendChild(div);
+
+  div.querySelector('.file-diff').addEventListener('input', function () {
+    const warning = div.querySelector('.file-size-warning');
+    warning.style.display = this.value.length > 30000 ? 'block' : 'none';
+  });
 }
 
 function removeFileBlock(btn) {
@@ -380,6 +413,7 @@ function updateStep(stepName, status, message, data) {
   if (!stepEl) return;
 
   stepEl.className = `pipeline-step ${status}`;
+  if (status === 'running') stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
   const msgEl = stepEl.querySelector('.step-message');
   if (message) msgEl.textContent = message;

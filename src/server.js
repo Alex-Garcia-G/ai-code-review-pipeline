@@ -1,5 +1,6 @@
 import express from 'express';
 import session from 'express-session';
+import connectPgSimple from 'connect-pg-simple';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { config } from 'dotenv';
@@ -11,10 +12,15 @@ import { saveReview, getHistory, getReviewById, setupHistory, clearHistory } fro
 import pool from './db.js';
 import { startOAuth, handleCallback, requireAuth } from './auth.js';
 
+const PgSession = connectPgSimple(session);
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.use(session({
+  store: process.env.DATABASE_URL
+    ? new PgSession({ pool, tableName: 'user_sessions', createTableIfMissing: true })
+    : undefined, // falls back to in-memory for local dev without a DB
   secret: process.env.SESSION_SECRET || 'dev-secret',
   resave: false,
   saveUninitialized: false,
