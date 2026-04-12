@@ -25,3 +25,6 @@ jobs:
 
       - name: Check for syntax errors
         run: node --check src/server.js src/orchestrator.js src/agents/planner.js src/agents/reviewer.js src/agents/security.js src/agents/synthesizer.js
+
+      - name: Run tests
+        run: npm test

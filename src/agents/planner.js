@@ -61,7 +61,7 @@ Return a JSON object with this exact shape:
   return parseJSON(response.content[0].text);
 }
 
-function parseJSON(text) {
+export function parseJSON(text) {
   const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   try {
     return JSON.parse(cleaned);
