@@ -68,11 +68,11 @@ async function loadSettings() {
 }
 
 function openSettings() {
-  document.getElementById('settingsOverlay').style.display = 'flex';
+  document.getElementById('settingsOverlay').classList.add('open');
 }
 
 function closeSettings() {
-  document.getElementById('settingsOverlay').style.display = 'none';
+  document.getElementById('settingsOverlay').classList.remove('open');
 }
 
 async function saveSettings() {

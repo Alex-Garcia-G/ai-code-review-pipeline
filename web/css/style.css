@@ -41,6 +41,13 @@ body {
   flex-direction: column;
 }
 
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
 /* ── Header ──────────────────────────────────────────────────────────────── */
 
 header {
@@ -160,6 +167,7 @@ main {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .panel-header {
@@ -271,11 +279,15 @@ main {
 .history-item {
   padding: 10px 14px;
   border-bottom: 1px solid var(--border);
+  border-left: 2px solid transparent;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.history-item:hover { background: var(--bg-hover); }
+.history-item:hover {
+  background: var(--bg-hover);
+  border-left-color: var(--blue);
+}
 
 .history-item:last-child { border-bottom: none; }
 
@@ -397,6 +409,7 @@ input[type="text"]:focus,
 textarea:focus {
   outline: none;
   border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
 }
 
 input::placeholder, textarea::placeholder {
@@ -470,7 +483,7 @@ input::placeholder, textarea::placeholder {
 /* ── Buttons ─────────────────────────────────────────────────────────────── */
 
 .btn-primary {
-  background: var(--blue);
+  background: linear-gradient(135deg, var(--blue), #4090e0);
   border: none;
   border-radius: var(--radius-sm);
   padding: 10px 20px;
@@ -479,14 +492,21 @@ input::placeholder, textarea::placeholder {
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  box-shadow: 0 2px 8px rgba(88, 166, 255, 0.2);
 }
 
-.btn-primary:hover:not(:disabled) { opacity: 0.85; }
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(88, 166, 255, 0.3);
+}
+
+.btn-primary:active:not(:disabled) { transform: translateY(0); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-ghost {
@@ -584,6 +604,11 @@ input::placeholder, textarea::placeholder {
   height: 20px;
   background: var(--border);
   margin-left: 10px;
+  transition: background 0.3s;
+}
+
+.pipeline-step.done + .step-connector {
+  background: var(--green);
 }
 
 .step-indicator {
@@ -680,9 +705,9 @@ input::placeholder, textarea::placeholder {
   margin-bottom: 16px;
 }
 
-.verdict-APPROVE       { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
-.verdict-REQUEST_CHANGES { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
-.verdict-COMMENT       { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow); }
+.verdict-APPROVE         { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); box-shadow: 0 0 14px rgba(63, 185, 80, 0.15); }
+.verdict-REQUEST_CHANGES { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); box-shadow: 0 0 14px rgba(248, 81, 73, 0.15); }
+.verdict-COMMENT         { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow); box-shadow: 0 0 14px rgba(210, 153, 34, 0.15); }
 
 .review-summary {
   color: var(--text);
@@ -818,12 +843,22 @@ footer {
 .settings-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 24px;
+  pointer-events: none;
+  visibility: hidden;
+  transition: background 0.2s, visibility 0s 0.2s;
+}
+
+.settings-overlay.open {
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+  visibility: visible;
+  transition: background 0.2s, visibility 0s 0s;
 }
 
 .settings-modal {
@@ -834,6 +869,15 @@ footer {
   max-width: 480px;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transform: translateY(12px);
+  opacity: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.settings-overlay.open .settings-modal {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .settings-header {
