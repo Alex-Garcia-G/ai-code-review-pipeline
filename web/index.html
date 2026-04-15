@@ -11,74 +11,81 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- Skip navigation for keyboard users -->
+  <a href="#main" class="skip-link">Skip to main content</a>
+
   <header>
     <div class="header-inner">
       <div class="header-logo">
-        <span class="logo-icon">⬡</span>
+        <span class="logo-icon" aria-hidden="true">⬡</span>
         <span class="logo-text">CodeReview<span class="logo-accent">AI</span></span>
       </div>
       <p class="header-subtitle">Multi-agent pipeline that reviews pull requests like a senior engineer</p>
       <div class="header-auth" id="headerAuth">
         <a href="/auth/github" class="btn-github" id="loginBtn">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
           Sign in with GitHub
         </a>
         <div class="user-info" id="userInfo" style="display:none">
           <img class="user-avatar" id="userAvatar" src="" alt="">
           <span class="user-name" id="userName"></span>
-          <button class="btn-settings" id="settingsBtn" title="Settings">⚙</button>
+          <button class="btn-settings" id="settingsBtn" title="Settings" aria-label="Open settings">⚙</button>
           <a href="/auth/logout" class="user-signout">Sign out</a>
         </div>
       </div>
     </div>
   </header>
 
-  <main>
+  <main id="main">
     <div class="layout">
 
       <!-- ── History Sidebar ──────────────────────────────────────── -->
-      <section class="panel panel-history" id="historyPanel">
+      <section class="panel panel-history" id="historyPanel" aria-label="Review history">
         <div class="panel-header">
           <h2>History</h2>
-          <span class="history-count" id="historyCount"></span>
+          <span class="history-count" id="historyCount" aria-live="polite"></span>
         </div>
-        <div id="historyList">
+        <div id="historyList" aria-live="polite">
           <p class="empty-history">No reviews yet</p>
         </div>
       </section>
 
       <!-- ── Input Panel ───────────────────────────────────────────── -->
-      <section class="panel panel-input">
+      <section class="panel panel-input" aria-label="Pull request input">
         <div class="panel-header">
           <h2>Pull Request</h2>
         </div>
 
         <div class="github-section">
-          <p class="samples-label">Review a real GitHub PR</p>
+          <p class="samples-label" id="prUrlDesc">Review a real GitHub PR</p>
+          <label for="prUrl" class="visually-hidden">GitHub Pull Request URL</label>
           <div class="github-input-row">
-            <input type="text" id="prUrl" placeholder="https://github.com/owner/repo/pull/123">
+            <input type="text" id="prUrl" placeholder="https://github.com/owner/repo/pull/123" aria-describedby="prUrlDesc fetchStatus">
             <button type="button" class="btn-fetch" id="fetchBtn">
               <span class="btn-text">Fetch</span>
-              <span class="btn-spinner" style="display:none">●●●</span>
+              <span class="btn-spinner" style="display:none" aria-hidden="true">●●●</span>
             </button>
           </div>
-          <p class="github-hint" id="fetchStatus"></p>
+          <p class="github-hint" id="fetchStatus" role="status" aria-live="polite" aria-atomic="true"></p>
         </div>
 
-        <div class="divider-label">or load a sample</div>
+        <div class="divider-label" aria-hidden="true">or load a sample</div>
 
         <div class="samples-section">
-          <div class="sample-buttons" id="sampleButtons">
+          <div class="sample-buttons" id="sampleButtons" role="list">
             <span class="loading-text">Loading samples...</span>
           </div>
         </div>
 
-        <div class="divider-label">or enter your own</div>
+        <div class="divider-label" aria-hidden="true">or enter your own</div>
 
-        <form id="prForm">
+        <p class="visually-hidden" id="requiredNote">Fields marked with an asterisk (*) are required.</p>
+
+        <form id="prForm" aria-describedby="requiredNote">
           <div class="field">
-            <label for="prTitle">PR Title <span class="required">*</span></label>
-            <input type="text" id="prTitle" placeholder="e.g. Add user authentication with JWT">
+            <label for="prTitle">PR Title <span class="required" aria-hidden="true">*</span></label>
+            <input type="text" id="prTitle" placeholder="e.g. Add user authentication with JWT" required aria-required="true" aria-describedby="prTitleError">
+            <span id="prTitleError" role="alert" class="field-error" hidden>PR Title is required.</span>
           </div>
 
           <div class="field">
@@ -86,23 +93,21 @@
             <textarea id="prDescription" rows="2" placeholder="What does this PR do? (optional)"></textarea>
           </div>
 
-          <div class="files-section">
-            <div class="files-header">
-              <label>Changed Files <span class="required">*</span></label>
-            </div>
+          <fieldset class="files-section">
+            <legend class="files-legend">Changed Files <span aria-hidden="true">*</span><span class="visually-hidden">(required)</span></legend>
             <div id="filesContainer"></div>
             <button type="button" class="btn-ghost" id="addFileBtn">+ Add file</button>
-          </div>
+          </fieldset>
 
           <button type="submit" class="btn-primary" id="runBtn">
             <span class="btn-text">Run Review</span>
-            <span class="btn-spinner" style="display:none">●●●</span>
+            <span class="btn-spinner" style="display:none" aria-hidden="true">●●●</span>
           </button>
         </form>
       </section>
 
       <!-- ── Output Panel ──────────────────────────────────────────── -->
-      <section class="panel panel-output" id="outputPanel">
+      <section class="panel panel-output" id="outputPanel" aria-label="Review output" aria-live="polite">
         <div class="panel-header">
           <h2>Review</h2>
           <button class="btn-copy" id="copyBtn" style="display:none">Copy</button>
@@ -110,45 +115,48 @@
         </div>
 
         <div id="emptyState" class="empty-state">
-          <div class="empty-icon">⬡</div>
+          <div class="empty-icon" aria-hidden="true">⬡</div>
           <p id="emptyStateMsg">Sign in with GitHub to get started</p>
           <p class="empty-sub" id="emptyStateSub">Three specialized agents will analyze your code in real time</p>
         </div>
 
         <div id="pipeline" style="display:none">
-          <div class="pipeline-steps">
-            <div class="pipeline-step" id="step-planning">
-              <div class="step-left">
+          <ol class="pipeline-steps" aria-label="Review pipeline progress">
+            <li class="pipeline-step" id="step-planning" aria-label="Planner Agent">
+              <div class="step-left" aria-hidden="true">
                 <div class="step-indicator"></div>
                 <div class="step-connector"></div>
               </div>
               <div class="step-body">
                 <div class="step-title">Planner Agent</div>
-                <div class="step-message"></div>
+                <div class="step-message" aria-live="polite"></div>
                 <div class="step-data" style="display:none"></div>
               </div>
-            </div>
-            <div class="pipeline-step" id="step-analyzing">
-              <div class="step-left">
+              <span class="visually-hidden step-status" aria-live="polite">Pending</span>
+            </li>
+            <li class="pipeline-step" id="step-analyzing" aria-label="Reviewer and Security Agents">
+              <div class="step-left" aria-hidden="true">
                 <div class="step-indicator"></div>
                 <div class="step-connector"></div>
               </div>
               <div class="step-body">
                 <div class="step-title">Reviewer + Security Agents</div>
-                <div class="step-message"></div>
+                <div class="step-message" aria-live="polite"></div>
                 <div class="step-data" style="display:none"></div>
               </div>
-            </div>
-            <div class="pipeline-step" id="step-synthesizing">
-              <div class="step-left">
+              <span class="visually-hidden step-status" aria-live="polite">Pending</span>
+            </li>
+            <li class="pipeline-step" id="step-synthesizing" aria-label="Synthesizer Agent">
+              <div class="step-left" aria-hidden="true">
                 <div class="step-indicator"></div>
               </div>
               <div class="step-body">
                 <div class="step-title">Synthesizer Agent</div>
-                <div class="step-message"></div>
+                <div class="step-message" aria-live="polite"></div>
               </div>
-            </div>
-          </div>
+              <span class="visually-hidden step-status" aria-live="polite">Pending</span>
+            </li>
+          </ol>
         </div>
 
         <div id="finalReview" style="display:none"></div>
@@ -159,21 +167,21 @@
 
   <footer>
     <div class="footer-inner">
-      <p>Architected &amp; built by <strong>Alexander Wheeler-Garcia</strong> &bull; Powered by Claude AI &bull; <a href="https://github.com/Alex-Garcia-G/ai-code-review-pipeline" target="_blank">GitHub</a></p>
+      <p>Architected &amp; built by <strong>Alexander Wheeler-Garcia</strong> &bull; Powered by Claude AI &bull; <a href="https://github.com/Alex-Garcia-G/ai-code-review-pipeline" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository (opens in new tab)">GitHub</a></p>
     </div>
   </footer>
 
   <!-- ── Settings Modal ──────────────────────────────────────────────────── -->
-  <div id="settingsOverlay" class="settings-overlay">
+  <div id="settingsOverlay" class="settings-overlay" role="dialog" aria-modal="true" aria-labelledby="settingsHeading">
     <div class="settings-modal">
       <div class="settings-header">
-        <h2>Settings</h2>
-        <button class="settings-close" id="settingsClose">✕</button>
+        <h2 id="settingsHeading">Settings</h2>
+        <button class="settings-close" id="settingsClose" aria-label="Close settings">✕</button>
       </div>
 
       <!-- Profile -->
       <div class="settings-section">
-        <div class="settings-section-title">Profile</div>
+        <h3 class="settings-section-title">Profile</h3>
         <div class="settings-profile">
           <img class="settings-avatar" id="settingsAvatar" src="" alt="">
           <div class="settings-profile-info">
@@ -185,32 +193,32 @@
 
       <!-- Review Preferences -->
       <div class="settings-section">
-        <div class="settings-section-title">Review Preferences</div>
+        <h3 class="settings-section-title">Review Preferences</h3>
 
         <div class="settings-field">
-          <label class="settings-label">Strictness</label>
+          <label class="settings-label" id="strictnessLabel">Strictness</label>
           <p class="settings-hint">How critical the agents are when reviewing code</p>
-          <div class="toggle-group" id="strictnessGroup">
-            <button class="toggle-btn" data-value="lenient">Lenient</button>
-            <button class="toggle-btn active" data-value="balanced">Balanced</button>
-            <button class="toggle-btn" data-value="strict">Strict</button>
+          <div class="toggle-group" id="strictnessGroup" role="group" aria-labelledby="strictnessLabel">
+            <button class="toggle-btn" data-value="lenient" aria-pressed="false">Lenient</button>
+            <button class="toggle-btn active" data-value="balanced" aria-pressed="true">Balanced</button>
+            <button class="toggle-btn" data-value="strict" aria-pressed="false">Strict</button>
           </div>
         </div>
 
         <div class="settings-field">
-          <label class="settings-label">Focus</label>
+          <label class="settings-label" id="focusLabel">Focus</label>
           <p class="settings-hint">What the agents prioritize in their review</p>
-          <div class="toggle-group" id="focusGroup">
-            <button class="toggle-btn" data-value="security">Security-heavy</button>
-            <button class="toggle-btn active" data-value="balanced">Balanced</button>
-            <button class="toggle-btn" data-value="quality">Quality-heavy</button>
+          <div class="toggle-group" id="focusGroup" role="group" aria-labelledby="focusLabel">
+            <button class="toggle-btn" data-value="security" aria-pressed="false">Security-heavy</button>
+            <button class="toggle-btn active" data-value="balanced" aria-pressed="true">Balanced</button>
+            <button class="toggle-btn" data-value="quality" aria-pressed="false">Quality-heavy</button>
           </div>
         </div>
       </div>
 
       <!-- Data Management -->
       <div class="settings-section">
-        <div class="settings-section-title">Data</div>
+        <h3 class="settings-section-title">Data</h3>
         <div class="settings-field">
           <label class="settings-label">Review History</label>
           <p class="settings-hint">Permanently delete all your past reviews</p>

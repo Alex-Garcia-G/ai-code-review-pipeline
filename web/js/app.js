@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('settingsOverlay').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeSettings();
   });
+  document.getElementById('settingsOverlay').addEventListener('keydown', handleSettingsFocusTrap);
   setupToggleGroups();
 
   // Restore last PR URL
@@ -53,11 +54,12 @@ async function initAuth() {
       const userInfo = document.getElementById('userInfo');
       userInfo.style.display = 'flex';
       document.getElementById('userAvatar').src = user.avatar_url;
-      document.getElementById('userAvatar').alt = user.username;
+      document.getElementById('userAvatar').alt = `${user.name || user.username}'s avatar`;
       document.getElementById('userName').textContent = user.name || user.username;
 
       // Populate settings modal profile
       document.getElementById('settingsAvatar').src = user.avatar_url;
+      document.getElementById('settingsAvatar').alt = `${user.name || user.username}'s avatar`;
       document.getElementById('settingsName').textContent = user.name || user.username;
       document.getElementById('settingsUsername').textContent = `@${user.username}`;
 
@@ -91,10 +93,26 @@ async function loadSettings() {
 
 function openSettings() {
   document.getElementById('settingsOverlay').classList.add('open');
+  // Focus first element in modal and trap focus inside
+  setTimeout(() => document.getElementById('settingsClose').focus(), 50);
 }
 
 function closeSettings() {
   document.getElementById('settingsOverlay').classList.remove('open');
+  document.getElementById('settingsBtn').focus();
+}
+
+function handleSettingsFocusTrap(e) {
+  if (e.key !== 'Tab') return;
+  const modal = document.querySelector('.settings-modal');
+  const focusable = modal.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])');
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey) {
+    if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+  } else {
+    if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
 }
 
 async function saveSettings() {
@@ -131,8 +149,12 @@ function setupToggleGroups() {
     const group = document.getElementById(groupId);
     group.querySelectorAll('.toggle-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        group.querySelectorAll('.toggle-btn').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
       });
     });
   });
@@ -141,7 +163,9 @@ function setupToggleGroups() {
 function applyToggleSelection(groupId, value) {
   const group = document.getElementById(groupId);
   group.querySelectorAll('.toggle-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.value === value);
+    const active = btn.dataset.value === value;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
 }
 
@@ -325,10 +349,13 @@ async function handleSubmit(e) {
   const title = document.getElementById('prTitle').value.trim();
   const description = document.getElementById('prDescription').value.trim();
 
+  const titleError = document.getElementById('prTitleError');
   if (!title) {
-    alert('Please enter a PR title.');
+    titleError.hidden = false;
+    document.getElementById('prTitle').focus();
     return;
   }
+  titleError.hidden = true;
 
   const files = [];
   document.querySelectorAll('.file-block').forEach(block => {
@@ -340,7 +367,7 @@ async function handleSubmit(e) {
   });
 
   if (files.length === 0) {
-    alert('Please add at least one file with a name and diff.');
+    document.getElementById('addFileBtn').focus();
     return;
   }
 
@@ -414,6 +441,12 @@ function updateStep(stepName, status, message, data) {
 
   stepEl.className = `pipeline-step ${status}`;
   if (status === 'running') stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // Announce step status to screen readers
+  const statusEl = stepEl.querySelector('.step-status');
+  if (statusEl) {
+    statusEl.textContent = status === 'running' ? 'In progress' : status === 'done' ? 'Complete' : 'Pending';
+  }
 
   const msgEl = stepEl.querySelector('.step-message');
   if (message) msgEl.textContent = message;
