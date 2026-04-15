@@ -12,7 +12,7 @@
 
   --text:         #e6edf3;
   --text-muted:   #8b949e;
-  --text-faint:   #6e7681;
+  --text-faint:   #8b949e;
 
   --blue:         #58a6ff;
   --green:        #3fb950;
@@ -381,7 +381,7 @@ main {
 .history-verdict.COMMENT          { background: var(--yellow-bg); color: var(--yellow); }
 
 .history-date {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-faint);
 }
 
@@ -1114,6 +1114,27 @@ footer {
 .settings-footer {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 8px;
   padding: 16px 24px;
+}
+
+.settings-error {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--red);
+  margin: 0;
+}
+
+/* ── Accessibility: reduced motion ───────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  main                              { animation: none; }
+  .skeleton-item                    { animation: none; }
+  .btn-spinner                      { animation: none; }
+  .empty-icon                       { animation: none; }
+  .pipeline-step.running .step-indicator { animation: none; box-shadow: 0 0 0 2px var(--yellow); }
+  .settings-modal,
+  .settings-overlay                 { transition: none; }
+  .btn-primary:hover:not(:disabled) { transform: none; }
 }

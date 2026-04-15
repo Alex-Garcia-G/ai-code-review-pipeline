@@ -69,15 +69,15 @@
           <p class="github-hint" id="fetchStatus" role="status" aria-live="polite" aria-atomic="true"></p>
         </div>
 
-        <div class="divider-label" aria-hidden="true">or load a sample</div>
+        <div class="divider-label">or load a sample</div>
 
         <div class="samples-section">
-          <div class="sample-buttons" id="sampleButtons" role="list">
-            <span class="loading-text">Loading samples...</span>
-          </div>
+          <ul class="sample-buttons" id="sampleButtons">
+            <li><span class="loading-text">Loading samples...</span></li>
+          </ul>
         </div>
 
-        <div class="divider-label" aria-hidden="true">or enter your own</div>
+        <div class="divider-label">or enter your own</div>
 
         <p class="visually-hidden" id="requiredNote">Fields marked with an asterisk (*) are required.</p>
 
@@ -107,11 +107,11 @@
       </section>
 
       <!-- ── Output Panel ──────────────────────────────────────────── -->
-      <section class="panel panel-output" id="outputPanel" aria-label="Review output" aria-live="polite">
+      <section class="panel panel-output" id="outputPanel" aria-label="Review output">
         <div class="panel-header">
           <h2>Review</h2>
-          <button class="btn-copy" id="copyBtn" style="display:none">Copy</button>
-          <button class="btn-clear" id="clearBtn" style="display:none">✕ Clear</button>
+          <button class="btn-copy" id="copyBtn" style="display:none" aria-label="Copy review to clipboard">Copy</button>
+          <button class="btn-clear" id="clearBtn" style="display:none"><span aria-hidden="true">✕</span> Clear</button>
         </div>
 
         <div id="emptyState" class="empty-state">
@@ -132,7 +132,7 @@
                 <div class="step-message" aria-live="polite"></div>
                 <div class="step-data" style="display:none"></div>
               </div>
-              <span class="visually-hidden step-status" aria-live="polite">Pending</span>
+              <span class="visually-hidden step-status" aria-live="polite" aria-label="Planner Agent status">Pending</span>
             </li>
             <li class="pipeline-step" id="step-analyzing" aria-label="Reviewer and Security Agents">
               <div class="step-left" aria-hidden="true">
@@ -144,7 +144,7 @@
                 <div class="step-message" aria-live="polite"></div>
                 <div class="step-data" style="display:none"></div>
               </div>
-              <span class="visually-hidden step-status" aria-live="polite">Pending</span>
+              <span class="visually-hidden step-status" aria-live="polite" aria-label="Reviewer and Security Agents status">Pending</span>
             </li>
             <li class="pipeline-step" id="step-synthesizing" aria-label="Synthesizer Agent">
               <div class="step-left" aria-hidden="true">
@@ -154,7 +154,7 @@
                 <div class="step-title">Synthesizer Agent</div>
                 <div class="step-message" aria-live="polite"></div>
               </div>
-              <span class="visually-hidden step-status" aria-live="polite">Pending</span>
+              <span class="visually-hidden step-status" aria-live="polite" aria-label="Synthesizer Agent status">Pending</span>
             </li>
           </ol>
         </div>
@@ -196,7 +196,7 @@
         <h3 class="settings-section-title">Review Preferences</h3>
 
         <div class="settings-field">
-          <label class="settings-label" id="strictnessLabel">Strictness</label>
+          <span class="settings-label" id="strictnessLabel">Strictness</span>
           <p class="settings-hint">How critical the agents are when reviewing code</p>
           <div class="toggle-group" id="strictnessGroup" role="group" aria-labelledby="strictnessLabel">
             <button class="toggle-btn" data-value="lenient" aria-pressed="false">Lenient</button>
@@ -206,7 +206,7 @@
         </div>
 
         <div class="settings-field">
-          <label class="settings-label" id="focusLabel">Focus</label>
+          <span class="settings-label" id="focusLabel">Focus</span>
           <p class="settings-hint">What the agents prioritize in their review</p>
           <div class="toggle-group" id="focusGroup" role="group" aria-labelledby="focusLabel">
             <button class="toggle-btn" data-value="security" aria-pressed="false">Security-heavy</button>
@@ -220,13 +220,23 @@
       <div class="settings-section">
         <h3 class="settings-section-title">Data</h3>
         <div class="settings-field">
-          <label class="settings-label">Review History</label>
+          <span class="settings-label">Review History</span>
           <p class="settings-hint">Permanently delete all your past reviews</p>
-          <button class="btn-danger" id="clearHistoryBtn">Clear all history</button>
+          <div id="clearHistoryDefault">
+            <button class="btn-danger" id="clearHistoryBtn">Clear all history</button>
+          </div>
+          <div id="clearHistoryConfirm" hidden>
+            <p class="settings-hint" style="color:var(--red)">This cannot be undone. Are you sure?</p>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn-danger" id="clearHistoryConfirmBtn">Yes, delete all</button>
+              <button class="btn-ghost" id="clearHistoryCancelBtn">Cancel</button>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="settings-footer">
+        <p role="alert" class="settings-error" id="settingsError" hidden></p>
         <button class="btn-ghost" id="settingsCancel">Cancel</button>
         <button class="btn-primary" id="settingsSave">Save changes</button>
       </div>

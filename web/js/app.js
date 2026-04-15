@@ -17,7 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('settingsClose').addEventListener('click', closeSettings);
   document.getElementById('settingsCancel').addEventListener('click', closeSettings);
   document.getElementById('settingsSave').addEventListener('click', saveSettings);
-  document.getElementById('clearHistoryBtn').addEventListener('click', clearHistoryWithConfirm);
+  document.getElementById('clearHistoryBtn').addEventListener('click', showClearHistoryConfirm);
+  document.getElementById('clearHistoryConfirmBtn').addEventListener('click', clearHistoryConfirmed);
+  document.getElementById('clearHistoryCancelBtn').addEventListener('click', hideClearHistoryConfirm);
   document.getElementById('settingsOverlay').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeSettings();
   });
@@ -100,6 +102,9 @@ function openSettings() {
 function closeSettings() {
   document.getElementById('settingsOverlay').classList.remove('open');
   document.getElementById('settingsBtn').focus();
+  // Reset transient state
+  hideClearHistoryConfirm();
+  document.getElementById('settingsError').hidden = true;
 }
 
 function handleSettingsFocusTrap(e) {
@@ -118,6 +123,7 @@ function handleSettingsFocusTrap(e) {
 async function saveSettings() {
   const strictness = getToggleValue('strictnessGroup');
   const focus = getToggleValue('focusGroup');
+  const errorEl = document.getElementById('settingsError');
 
   try {
     await fetch('/api/settings', {
@@ -126,21 +132,36 @@ async function saveSettings() {
       body: JSON.stringify({ strictness, focus })
     });
     userSettings = { strictness, focus };
+    errorEl.hidden = true;
     closeSettings();
   } catch {
-    alert('Could not save settings. Please try again.');
+    errorEl.textContent = 'Could not save settings. Please try again.';
+    errorEl.hidden = false;
   }
 }
 
-async function clearHistoryWithConfirm() {
-  if (!confirm('Delete all your review history? This cannot be undone.')) return;
+function showClearHistoryConfirm() {
+  document.getElementById('clearHistoryDefault').hidden = true;
+  document.getElementById('clearHistoryConfirm').hidden = false;
+  document.getElementById('clearHistoryConfirmBtn').focus();
+}
+
+function hideClearHistoryConfirm() {
+  document.getElementById('clearHistoryConfirm').hidden = true;
+  document.getElementById('clearHistoryDefault').hidden = false;
+}
+
+async function clearHistoryConfirmed() {
+  const errorEl = document.getElementById('settingsError');
   try {
     await fetch('/api/history', { method: 'DELETE' });
+    hideClearHistoryConfirm();
     closeSettings();
     document.getElementById('historyList').innerHTML = '<p class="empty-history">No reviews yet</p>';
     document.getElementById('historyCount').textContent = '';
   } catch {
-    alert('Could not clear history. Please try again.');
+    errorEl.textContent = 'Could not clear history. Please try again.';
+    errorEl.hidden = false;
   }
 }
 
@@ -182,15 +203,17 @@ async function loadSamples() {
     const samples = await fetch('/api/samples').then(r => r.json());
     container.innerHTML = '';
     samples.forEach(sample => {
+      const li = document.createElement('li');
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'sample-btn';
       btn.innerHTML = `<strong>${sample.title}</strong><span>${sample.description}</span>`;
       btn.addEventListener('click', () => loadSample(sample.id));
-      container.appendChild(btn);
+      li.appendChild(btn);
+      container.appendChild(li);
     });
   } catch {
-    container.innerHTML = '<span class="loading-text">Could not load samples (is the server running?)</span>';
+    container.innerHTML = '<li><span class="loading-text">Could not load samples (is the server running?)</span></li>';
   }
 }
 
